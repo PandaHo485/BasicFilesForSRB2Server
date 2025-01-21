@@ -118,7 +118,7 @@
         const addonsButton = document.getElementById('addons-button');
         const creationsButton = document.getElementById('creations-button');
         const bioLink = document.getElementById('bio-link');
-         const labelsContainer = document.querySelector('.labels')
+        const labelsContainer = document.querySelector('.labels')
         const addonsContainer = document.getElementById('addons-container');
         const creationsContainer = document.getElementById('creations-container');
         const fileListContainers = [addonsContainer, creationsContainer]
@@ -136,32 +136,32 @@
          const fetchAndDisplayFiles = async (container, directory, emptyMessage) => {
           const fileList = container.querySelector("ul");
           fileList.innerHTML = '';
-           const apiUrl = `https://api.github.com/repos/PandaHo485/BasicFilesForSRB2Server/contents/${directory}`
+          const apiUrl = `https://api.github.com/repos/PandaHo485/BasicFilesForSRB2Server/contents/${directory}`
 
              try{
-               const response = await fetch(apiUrl)
-               if(!response.ok) throw new Error("Network error")
+                const response = await fetch(apiUrl)
+                if(!response.ok) throw new Error("Network error")
                const data = await response.json()
-                if(data.length === 0) {
-                  emptyMessage.classList.remove('hidden')
+                 if(data.length === 0) {
+                    emptyMessage.classList.remove('hidden')
                      container.classList.remove('hidden')
                      return
-                }
-               emptyMessage.classList.add('hidden');
+                 }
+                emptyMessage.classList.add('hidden');
                data.forEach(item => {
                     if (item.type === 'file') {
-                        const listItem = document.createElement("li");
+                       const listItem = document.createElement("li");
                         const link = document.createElement("a");
                         link.href = item.name;
                         link.textContent = item.name;
-                         link.addEventListener('click', function (){
-                            link.classList.add('downloaded')
-                         });
+                        link.addEventListener('click', function (){
+                           link.classList.add('downloaded')
+                        });
                         listItem.appendChild(link);
                         fileList.appendChild(listItem);
                     }
                 });
-               container.classList.remove('hidden')
+                container.classList.remove('hidden')
              }
              catch(error){
                  console.log(error)
@@ -173,113 +173,107 @@
          const hideOtherContainers = (current) => {
              fileListContainers.forEach(container => {
                if (container !== current) {
-                    container.classList.add('hidden')
-                    container.querySelector('.loading').style.display = ''
-                    container.querySelector('.empty-message').classList.add('hidden');
+                  container.classList.add('hidden')
+                  container.querySelector('.loading').style.display = ''
+                   container.querySelector('.empty-message').classList.add('hidden');
                }
            })
         }
-       const toggleButton = (container, button) => {
+        const toggleButton = (container, button) => {
             if (container.classList.contains('hidden')) {
                button.textContent = 'Hide';
             }
             else{
-                 button.textContent = button.id.replace('-button', '');
+                button.textContent = button.id.replace('-button', '');
             }
        }
-        // Show/Hide functionality for addons
-        addonsButton.addEventListener('click', () => {
-           if(!canToggleAddons){
-              return;
-           }
-            labelsContainer.classList.toggle('hidden');
-            addonsButton.classList.remove('hidden')
 
-          hideOtherContainers(addonsContainer);
-           if(addonsContainer.classList.contains('hidden')){
-            toggleAddonsCount++;
-              fetchAndDisplayFiles(addonsContainer, 'addons', addonsContainer.querySelector('.empty-message'))
-           }
-          else {
-             addonsContainer.classList.add('hidden');
-             addonsContainer.querySelector('.loading').style.display = '';
+       const toggleCategory = (container, button, categoryName) => {
+            if(!canToggleAddons && categoryName === 'addons' ){
+                return
+            }
+            if(!canToggleCreations && categoryName === 'creations'){
+                return
+            }
+          labelsContainer.classList.toggle('hidden');
+          button.classList.remove('hidden')
+           hideOtherContainers(container);
+            if(container.classList.contains('hidden')){
+              toggleButton(container, button);
+                if(categoryName === 'addons') toggleAddonsCount++;
+               if(categoryName === 'creations') toggleCreationsCount++;
+              fetchAndDisplayFiles(container,  categoryName === 'addons' ? 'addons' : 'my_addons', container.querySelector('.empty-message'))
 
+           }
+            else {
+             container.classList.add('hidden');
+             container.querySelector('.loading').style.display = '';
           }
-            toggleButton(addonsContainer, addonsButton);
-           if(toggleAddonsCount > SHOW_HIDE_LIMIT){
-                alert("Hey! End this toy game! Download or go!");
-                canToggleAddons = false;
-                setTimeout(() => {
-                  canToggleAddons = true;
-                }, COOLDOWN_TIME);
+            toggleButton(container, button);
+           if((categoryName === 'addons' && toggleAddonsCount > SHOW_HIDE_LIMIT) || (categoryName === 'creations' && toggleCreationsCount > SHOW_HIDE_LIMIT)){
+                 alert("Hey! End this toy game! Download or go!");
+               if(categoryName === 'addons') {
+                   canToggleAddons = false;
+                   setTimeout(() => {
+                      canToggleAddons = true;
+                   }, COOLDOWN_TIME);
+               }
+              if(categoryName === 'creations'){
+                canToggleCreations = false;
+                 setTimeout(() => {
+                   canToggleCreations = true;
+               }, COOLDOWN_TIME);
            }
-        });
 
+           }
+       }
+        // Show/Hide functionality for addons
+         addonsButton.addEventListener('click', () => {
+              toggleCategory(addonsContainer, addonsButton, 'addons')
+         });
         // Show/Hide functionality for creations
         creationsButton.addEventListener('click', () => {
-           if(!canToggleCreations){
-               return;
-           }
-          labelsContainer.classList.toggle('hidden');
-            creationsButton.classList.remove('hidden')
-          hideOtherContainers(creationsContainer);
-         if(creationsContainer.classList.contains('hidden')){
-             toggleCreationsCount++;
-              fetchAndDisplayFiles(creationsContainer, 'my_addons', creationsContainer.querySelector('.empty-message'))
-         }
-         else{
-           creationsContainer.classList.add('hidden')
-            creationsContainer.querySelector('.loading').style.display = ''
-          }
-           toggleButton(creationsContainer, creationsButton);
-          if(toggleCreationsCount > SHOW_HIDE_LIMIT){
-            alert("Hey! End this toy game! Download or go!");
-            canToggleCreations = false;
-            setTimeout(() => {
-              canToggleCreations = true;
-            }, COOLDOWN_TIME);
-         }
-        });
+               toggleCategory(creationsContainer, creationsButton, 'creations')
+       });
 
           // Search functionality
           searchBar.addEventListener('input', () => {
               clearTimeout(searchTimeout);
             if(searchBar.value.length < 1) {
                 searchBar.placeholder = "Search for an addon"
-                fileListContainers.forEach(container => {
-                      container.classList.remove('hidden');
-                })
-                 return
-            }
-           searchBar.placeholder = ''
-             searchTimeout = setTimeout(() => {
+               fileListContainers.forEach(container => {
+                     container.classList.remove('hidden');
+               })
+                return
+           }
+            searchBar.placeholder = ''
+           searchTimeout = setTimeout(() => {
                 const searchTerm = searchBar.value.toLowerCase();
-                fileListContainers.forEach(container => {
-                   const fileList = container.querySelectorAll('li a')
+               fileListContainers.forEach(container => {
+                  const fileList = container.querySelectorAll('li a')
                    fileList.forEach(link => {
                       const filename = link.textContent.toLowerCase()
                        const index = filename.indexOf(searchTerm);
                        if (index > -1) {
                            let highlighted = filename.substring(0, index)
-                           highlighted += `<span style="background-color:orange;">${filename.substring(index, index+ searchTerm.length)}</span>`
+                          highlighted += `<span style="background-color:orange;">${filename.substring(index, index+ searchTerm.length)}</span>`
                           highlighted += filename.substring(index+searchTerm.length)
                            link.innerHTML = highlighted
-                           link.parentElement.style.display = 'block'
+                            link.parentElement.style.display = 'block'
                        }
                        else{
                            link.parentElement.style.display = 'none'
-                       }
-                   });
-                   if(!container.querySelector('li a:not([style*="display: none;"])')){
-                     container.classList.add('hidden')
+                      }
+                  });
+                  if(!container.querySelector('li a:not([style*="display: none;"])')){
+                       container.classList.add('hidden')
                   }
                    else{
-                     container.classList.remove('hidden')
+                      container.classList.remove('hidden')
                    }
                })
-            }, 2000);
-         });
-
+           }, 2000);
+        });
     </script>
 </body>
 </html>
