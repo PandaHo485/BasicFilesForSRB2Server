@@ -3,10 +3,7 @@ body {
     margin: 0; /* Remove default margin */
     background-size: cover;
     background-repeat: no-repeat;
-}
-
-body {
-  background-image: url("background.png");
+    background-image: url("background.png");
 }
 
 .side-container {
@@ -21,6 +18,7 @@ body {
     position: relative;
     z-index: 1;
     box-sizing: border-box;
+    text-align: center;
 }
 
 .lower-side {
@@ -42,11 +40,16 @@ body {
 .labels button:hover, .labels a:hover{
     text-decoration: underline;
 }
+.search-bar-container {
+  display: flex;
+  justify-content: center;
+  margin: 10px 0;
+}
 .search-bar {
-  margin-bottom: 20px;
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
+   width: 70%;
 }
 
 /* Bio page specific styles */
