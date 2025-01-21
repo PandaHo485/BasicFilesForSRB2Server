@@ -97,34 +97,34 @@
         </div>
           <img src="image.png" alt="My Image" style="width: 200px; margin: 20px auto;">
           <div class="labels">
-            <button id="addons-button">Addons</button>
-            <button id="creations-button">Creations</button>
+            <button id="Addons-button">Addons</button>
+            <button id="Creations-button">Creations</button>
             <a id="bio-link" href="bio.html">Biology</a>
           </div>
       </div>
       <div class="lower-side">
-        <div id="addons-container" class="file-list-container hidden">
-            <div class="loading hidden">loading...</div>
-            <div class="empty-message hidden">Nothing is here right now...</div>
-            <ul class="file-list" data-dir="addons"></ul>
+        <div id="Addons-container" class="file-list-container hidden">
+            <div class="loading hidden">Searching in addons (If nothing, then yeah, nothing Xd)</div>
+            <div class="empty-message hidden">Files from Addons...</div>
+            <ul class="file-list" data-dir="Addons"></ul>
         </div>
-        <div id="creations-container" class="file-list-container hidden">
-            <div class="loading hidden">loading...</div>
-            <div class="empty-message hidden">Nothing is here right now...</div>
-            <ul class="file-list" data-dir="my_addons"></ul>
+        <div id="Creations-container" class="file-list-container hidden">
+            <div class="loading hidden">Searching in creations (If nothing, then yeah, nothing Xd)</div>
+            <div class="empty-message hidden">Files from Creations (My made wads)...</div>
+            <ul class="file-list" data-dir="my_Addons"></ul>
         </div>
       </div>
   </div>
 
     <script>
         const searchBar = document.querySelector('.search-bar');
-        const addonsButton = document.getElementById('addons-button');
-        const creationsButton = document.getElementById('creations-button');
+        const AddonsButton = document.getElementById('Addons-button');
+        const CreationsButton = document.getElementById('Creations-button');
         const bioLink = document.getElementById('bio-link');
         const labelsContainer = document.querySelector('.labels')
-        const addonsContainer = document.getElementById('addons-container');
-        const creationsContainer = document.getElementById('creations-container');
-        const fileListContainers = [addonsContainer, creationsContainer]
+        const AddonsContainer = document.getElementById('Addons-container');
+        const CreationsContainer = document.getElementById('Creations-container');
+        const fileListContainers = [AddonsContainer, CreationsContainer]
         const loadingElements = document.querySelectorAll('.loading')
 
         let searchTimeout;
@@ -182,18 +182,18 @@
                      container.querySelector('.empty-message').classList.add('hidden');
                 }
           })
-           if(categoryName === "addons"){
-                creationsButton.classList.add('hidden');
+           if(categoryName === "Addons"){
+                CreationsButton.classList.add('hidden');
              bioLink.classList.add('hidden');
             }
-           else if(categoryName === "creations"){
-                addonsButton.classList.add('hidden');
+           else if(categoryName === "Creations"){
+                AddonsButton.classList.add('hidden');
               bioLink.classList.add('hidden');
             }
         }
         const showAllButtons = () => {
-             creationsButton.classList.remove('hidden');
-               addonsButton.classList.remove('hidden');
+             CreationsButton.classList.remove('hidden');
+               AddonsButton.classList.remove('hidden');
             bioLink.classList.remove('hidden');
         }
         const toggleButton = (container, button) => {
@@ -205,18 +205,18 @@
            }
         }
        const toggleCategory = (container, button, categoryName) => {
-            if(!canToggleAddons && categoryName === 'addons' ){
+            if(!canToggleAddons && categoryName === 'Addons' ){
                 return
           }
-            if(!canToggleCreations && categoryName === 'creations'){
+            if(!canToggleCreations && categoryName === 'Creations'){
                return
             }
           hideOtherContainers(container, categoryName);
             if(container.classList.contains('hidden')){
                  toggleButton(container, button);
-               if(categoryName === 'addons') toggleAddonsCount++;
-               if(categoryName === 'creations') toggleCreationsCount++;
-              fetchAndDisplayFiles(container,  categoryName === 'addons' ? 'addons' : 'my_addons', container.querySelector('.empty-message'), container.querySelector('.loading'))
+               if(categoryName === 'Addons') toggleAddonsCount++;
+               if(categoryName === 'Creations') toggleCreationsCount++;
+              fetchAndDisplayFiles(container,  categoryName === 'Addons' ? 'Addons' : 'my_Addons', container.querySelector('.empty-message'), container.querySelector('.loading'))
          }
             else {
                 toggleButton(container, button);
@@ -225,15 +225,15 @@
                showAllButtons();
            }
 
-            if((categoryName === 'addons' && toggleAddonsCount > SHOW_HIDE_LIMIT) || (categoryName === 'creations' && toggleCreationsCount > SHOW_HIDE_LIMIT)){
+            if((categoryName === 'Addons' && toggleAddonsCount > SHOW_HIDE_LIMIT) || (categoryName === 'Creations' && toggleCreationsCount > SHOW_HIDE_LIMIT)){
                  alert("Hey! End this toy game! Download or go!");
-                if(categoryName === 'addons') {
+                if(categoryName === 'Addons') {
                    canToggleAddons = false;
                    setTimeout(() => {
                        canToggleAddons = true;
                     }, COOLDOWN_TIME);
                 }
-                if(categoryName === 'creations'){
+                if(categoryName === 'Creations'){
                   canToggleCreations = false;
                     setTimeout(() => {
                        canToggleCreations = true;
@@ -242,14 +242,14 @@
             }
         }
 
-        // Show/Hide functionality for addons
-        addonsButton.addEventListener('click', () => {
-              toggleCategory(addonsContainer, addonsButton, 'addons');
+        // Show/Hide functionality for Addons
+        AddonsButton.addEventListener('click', () => {
+              toggleCategory(AddonsContainer, AddonsButton, 'Addons');
         });
 
-        // Show/Hide functionality for creations
-         creationsButton.addEventListener('click', () => {
-                toggleCategory(creationsContainer, creationsButton, 'creations');
+        // Show/Hide functionality for Creations
+         CreationsButton.addEventListener('click', () => {
+                toggleCategory(CreationsContainer, CreationsButton, 'Creations');
          });
         // Search functionality
          searchBar.addEventListener('input', () => {
