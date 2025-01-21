@@ -80,6 +80,9 @@
           font-style: italic;
           color: grey
         }
+        .labels .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -115,6 +118,7 @@
         const addonsButton = document.getElementById('addons-button');
         const creationsButton = document.getElementById('creations-button');
         const bioLink = document.getElementById('bio-link');
+         const labelsContainer = document.querySelector('.labels')
         const addonsContainer = document.getElementById('addons-container');
         const creationsContainer = document.getElementById('creations-container');
         const fileListContainers = [addonsContainer, creationsContainer]
@@ -129,22 +133,21 @@
         const SHOW_HIDE_LIMIT = 4;
 
         // Function to fetch and display files from a directory
-        const fetchAndDisplayFiles = async (container, directory) => {
+         const fetchAndDisplayFiles = async (container, directory, emptyMessage) => {
           const fileList = container.querySelector("ul");
-          const emptyMessage = container.querySelector('.empty-message')
           fileList.innerHTML = '';
            const apiUrl = `https://api.github.com/repos/PandaHo485/BasicFilesForSRB2Server/contents/${directory}`
+
              try{
                const response = await fetch(apiUrl)
                if(!response.ok) throw new Error("Network error")
                const data = await response.json()
-
-               if(data.length === 0) {
-                emptyMessage.classList.remove('hidden')
-                  container.classList.remove('hidden')
-                 return
-               }
-
+                if(data.length === 0) {
+                  emptyMessage.classList.remove('hidden')
+                     container.classList.remove('hidden')
+                     return
+                }
+               emptyMessage.classList.add('hidden');
                data.forEach(item => {
                     if (item.type === 'file') {
                         const listItem = document.createElement("li");
@@ -158,8 +161,7 @@
                         fileList.appendChild(listItem);
                     }
                 });
-
-              container.classList.remove('hidden')
+               container.classList.remove('hidden')
              }
              catch(error){
                  console.log(error)
@@ -167,35 +169,43 @@
              finally{
                container.querySelector('.loading').style.display = 'none';
              }
-        };
+         };
          const hideOtherContainers = (current) => {
-          fileListContainers.forEach(container => {
-              if (container !== current) {
-                 container.classList.add('hidden')
-                  container.querySelector('.loading').style.display = ''
-                  container.querySelector('.empty-message').classList.add('hidden');
-              }
-          })
+             fileListContainers.forEach(container => {
+               if (container !== current) {
+                    container.classList.add('hidden')
+                    container.querySelector('.loading').style.display = ''
+                    container.querySelector('.empty-message').classList.add('hidden');
+               }
+           })
         }
-
+       const toggleButton = (container, button) => {
+            if (container.classList.contains('hidden')) {
+               button.textContent = 'Hide';
+            }
+            else{
+                 button.textContent = button.id.replace('-button', '');
+            }
+       }
         // Show/Hide functionality for addons
         addonsButton.addEventListener('click', () => {
            if(!canToggleAddons){
               return;
            }
+            labelsContainer.classList.toggle('hidden');
+            addonsButton.classList.remove('hidden')
+
           hideOtherContainers(addonsContainer);
-          if(addonsContainer.classList.contains('hidden')){
-           toggleAddonsCount++;
-           addonsButton.textContent = "Hide";
-              fetchAndDisplayFiles(addonsContainer, 'addons')
+           if(addonsContainer.classList.contains('hidden')){
+            toggleAddonsCount++;
+              fetchAndDisplayFiles(addonsContainer, 'addons', addonsContainer.querySelector('.empty-message'))
            }
           else {
-           addonsContainer.classList.add('hidden')
-           addonsButton.textContent = "Addons";
-           addonsContainer.querySelector('.loading').style.display = '';
-           addonsContainer.querySelector('.empty-message').classList.add('hidden');
-          }
+             addonsContainer.classList.add('hidden');
+             addonsContainer.querySelector('.loading').style.display = '';
 
+          }
+            toggleButton(addonsContainer, addonsButton);
            if(toggleAddonsCount > SHOW_HIDE_LIMIT){
                 alert("Hey! End this toy game! Download or go!");
                 canToggleAddons = false;
@@ -210,19 +220,18 @@
            if(!canToggleCreations){
                return;
            }
-         hideOtherContainers(creationsContainer);
+          labelsContainer.classList.toggle('hidden');
+            creationsButton.classList.remove('hidden')
+          hideOtherContainers(creationsContainer);
          if(creationsContainer.classList.contains('hidden')){
              toggleCreationsCount++;
-             creationsButton.textContent = "Hide";
-              fetchAndDisplayFiles(creationsContainer, 'my_addons')
+              fetchAndDisplayFiles(creationsContainer, 'my_addons', creationsContainer.querySelector('.empty-message'))
          }
          else{
-            creationsContainer.classList.add('hidden')
-            creationsButton.textContent = "Creations"
+           creationsContainer.classList.add('hidden')
             creationsContainer.querySelector('.loading').style.display = ''
-            creationsContainer.querySelector('.empty-message').classList.add('hidden');
-         }
-
+          }
+           toggleButton(creationsContainer, creationsButton);
           if(toggleCreationsCount > SHOW_HIDE_LIMIT){
             alert("Hey! End this toy game! Download or go!");
             canToggleCreations = false;
@@ -234,42 +243,41 @@
 
           // Search functionality
           searchBar.addEventListener('input', () => {
-             clearTimeout(searchTimeout);
+              clearTimeout(searchTimeout);
             if(searchBar.value.length < 1) {
                 searchBar.placeholder = "Search for an addon"
-                 fileListContainers.forEach(container => {
-                       container.classList.remove('hidden');
-                 })
+                fileListContainers.forEach(container => {
+                      container.classList.remove('hidden');
+                })
                  return
             }
            searchBar.placeholder = ''
              searchTimeout = setTimeout(() => {
                 const searchTerm = searchBar.value.toLowerCase();
                 fileListContainers.forEach(container => {
-                    const fileList = container.querySelectorAll('li a')
-                    fileList.forEach(link => {
-                       const filename = link.textContent.toLowerCase()
+                   const fileList = container.querySelectorAll('li a')
+                   fileList.forEach(link => {
+                      const filename = link.textContent.toLowerCase()
                        const index = filename.indexOf(searchTerm);
                        if (index > -1) {
-                            let highlighted = filename.substring(0, index)
+                           let highlighted = filename.substring(0, index)
                            highlighted += `<span style="background-color:orange;">${filename.substring(index, index+ searchTerm.length)}</span>`
-                            highlighted += filename.substring(index+searchTerm.length)
+                          highlighted += filename.substring(index+searchTerm.length)
                            link.innerHTML = highlighted
                            link.parentElement.style.display = 'block'
                        }
                        else{
-                         link.parentElement.style.display = 'none'
+                           link.parentElement.style.display = 'none'
                        }
-                  });
-
-                    if(!container.querySelector('li a:not([style*="display: none;"])')){
-                      container.classList.add('hidden')
-                    }
-                    else{
-                       container.classList.remove('hidden')
-                    }
-                })
-             }, 2000);
+                   });
+                   if(!container.querySelector('li a:not([style*="display: none;"])')){
+                     container.classList.add('hidden')
+                  }
+                   else{
+                     container.classList.remove('hidden')
+                   }
+               })
+            }, 2000);
          });
 
     </script>
