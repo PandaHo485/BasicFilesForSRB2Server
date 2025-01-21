@@ -118,7 +118,7 @@
         const addonsButton = document.getElementById('addons-button');
         const creationsButton = document.getElementById('creations-button');
         const bioLink = document.getElementById('bio-link');
-        const labelsContainer = document.querySelector('.labels')
+         const labelsContainer = document.querySelector('.labels')
         const addonsContainer = document.getElementById('addons-container');
         const creationsContainer = document.getElementById('creations-container');
         const fileListContainers = [addonsContainer, creationsContainer]
@@ -141,9 +141,9 @@
              try{
                 const response = await fetch(apiUrl)
                 if(!response.ok) throw new Error("Network error")
-               const data = await response.json()
+                const data = await response.json()
                  if(data.length === 0) {
-                    emptyMessage.classList.remove('hidden')
+                     emptyMessage.classList.remove('hidden')
                      container.classList.remove('hidden')
                      return
                  }
@@ -161,7 +161,7 @@
                         fileList.appendChild(listItem);
                     }
                 });
-                container.classList.remove('hidden')
+               container.classList.remove('hidden')
              }
              catch(error){
                  console.log(error)
@@ -200,9 +200,9 @@
            hideOtherContainers(container);
             if(container.classList.contains('hidden')){
               toggleButton(container, button);
-                if(categoryName === 'addons') toggleAddonsCount++;
-               if(categoryName === 'creations') toggleCreationsCount++;
-              fetchAndDisplayFiles(container,  categoryName === 'addons' ? 'addons' : 'my_addons', container.querySelector('.empty-message'))
+               if(categoryName === 'addons') toggleAddonsCount++;
+                if(categoryName === 'creations') toggleCreationsCount++;
+                fetchAndDisplayFiles(container,  categoryName === 'addons' ? 'addons' : 'my_addons', container.querySelector('.empty-message'))
 
            }
             else {
@@ -265,7 +265,7 @@
                            link.parentElement.style.display = 'none'
                       }
                   });
-                  if(!container.querySelector('li a:not([style*="display: none;"])')){
+                  if(!container.querySelector('li a:not([style*="display: none;"])")){
                        container.classList.add('hidden')
                   }
                    else{
