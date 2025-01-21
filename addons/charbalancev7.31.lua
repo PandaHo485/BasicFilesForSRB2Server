@@ -1,5 +1,5 @@
 -- Tails & Knuckles, Amy, Fang, Metal Sonic buff lua
--- Пpивeт вceм pyсcкoгoвopящим!
+-- ГЏpГЁГўeГІ ГўceГ¬ pyГ±cГЄoГЈoГўopГїГ№ГЁГ¬!
 -- Come join the best community at SRB2WorkShop.org!
 
 -- ~
