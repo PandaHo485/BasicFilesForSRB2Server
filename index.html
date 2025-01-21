@@ -97,35 +97,35 @@
         </div>
           <img src="image.png" alt="My Image" style="width: 200px; margin: 20px auto;">
           <div class="labels">
-            <button id="Addons-button">Addons</button>
-            <button id="Creations-button">Creations</button>
+            <button id="addons-button">Addons</button>
+            <button id="creations-button">Creations</button>
             <a id="bio-link" href="bio.html">Biology</a>
           </div>
       </div>
       <div class="lower-side">
-        <div id="Addons-container" class="file-list-container hidden">
-            <div class="loading hidden">Searching in addons (If nothing, then yeah, nothing Xd)</div>
-            <div class="empty-message hidden">Files from Addons...</div>
-            <ul class="file-list" data-dir="Addons"></ul>
+        <div id="addons-container" class="file-list-container hidden">
+            <div class="loading hidden">loading...</div>
+            <div class="empty-message hidden">Nothing is here right now...</div>
+            <ul class="file-list" data-dir="addons"></ul>
         </div>
-        <div id="Creations-container" class="file-list-container hidden">
-            <div class="loading hidden">Searching in creations (If nothing, then yeah, nothing Xd)</div>
-            <div class="empty-message hidden">Files from Creations (My made wads)...</div>
-            <ul class="file-list" data-dir="my_Addons"></ul>
+        <div id="creations-container" class="file-list-container hidden">
+            <div class="loading hidden">loading...</div>
+            <div class="empty-message hidden">Nothing is here right now...</div>
+            <ul class="file-list" data-dir="my_addons"></ul>
         </div>
       </div>
   </div>
 
     <script>
         const searchBar = document.querySelector('.search-bar');
-        const AddonsButton = document.getElementById('Addons-button');
-        const CreationsButton = document.getElementById('Creations-button');
+        const addonsButton = document.getElementById('addons-button');
+        const creationsButton = document.getElementById('creations-button');
         const bioLink = document.getElementById('bio-link');
         const labelsContainer = document.querySelector('.labels')
-        const AddonsContainer = document.getElementById('Addons-container');
-        const CreationsContainer = document.getElementById('Creations-container');
-        const fileListContainers = [AddonsContainer, CreationsContainer]
-        const loadingElements = document.querySelectorAll('.loading')
+        const addonsContainer = document.getElementById('addons-container');
+        const creationsContainer = document.getElementById('creations-container');
+        const fileListContainers = [addonsContainer, creationsContainer]
+         const loadingElements = document.querySelectorAll('.loading')
 
         let searchTimeout;
         let toggleAddonsCount = 0
@@ -134,6 +134,8 @@
         let canToggleCreations = true
         const COOLDOWN_TIME = 4000;
         const SHOW_HIDE_LIMIT = 4;
+        const GITHUB_REPO_URL = 'https://github.com/PandaHo485/BasicFilesForSRB2Server/raw/main/';
+
 
         // Function to fetch and display files from a directory
         const fetchAndDisplayFiles = async (container, directory, emptyMessage, loading) => {
@@ -141,153 +143,151 @@
           fileList.innerHTML = '';
            const apiUrl = `https://api.github.com/repos/PandaHo485/BasicFilesForSRB2Server/contents/${directory}`
 
-            try {
-               loading.classList.remove('hidden')
-                const response = await fetch(apiUrl)
-                if(!response.ok) throw new Error("Network error")
-               const data = await response.json()
-                 if (data.length === 0) {
-                     emptyMessage.classList.remove('hidden')
-                     container.classList.remove('hidden')
-                     return
+           try{
+                loading.classList.remove('hidden')
+               const response = await fetch(apiUrl)
+              if(!response.ok) throw new Error("Network error")
+              const data = await response.json()
+               if (data.length === 0) {
+                    emptyMessage.classList.remove('hidden')
+                  container.classList.remove('hidden')
+                 return
                 }
                emptyMessage.classList.add('hidden');
-                data.forEach(item => {
-                    if (item.type === 'file') {
+              data.forEach(item => {
+                   if (item.type === 'file') {
                        const listItem = document.createElement("li");
                         const link = document.createElement("a");
-                        link.href = item.name;
+                         link.href = GITHUB_REPO_URL + directory + '/' + item.name;
                         link.textContent = item.name;
-                        link.addEventListener('click', function (){
-                           link.classList.add('downloaded')
-                        });
-                        listItem.appendChild(link);
+                       link.addEventListener('click', function (){
+                            link.classList.add('downloaded')
+                       });
+                       listItem.appendChild(link);
                         fileList.appendChild(listItem);
                    }
-               });
-                container.classList.remove('hidden')
-
+              });
+              container.classList.remove('hidden')
            } catch (error) {
-               console.log(error)
-           }
-          finally{
+                console.log(error)
+          }
+           finally{
                 loading.classList.add('hidden')
-           }
-        };
-         const hideOtherContainers = (current, categoryName) => {
-           fileListContainers.forEach(container => {
-                 if (container !== current) {
-                     container.classList.add('hidden')
-                     container.querySelector('.loading').classList.add('hidden')
-                     container.querySelector('.empty-message').classList.add('hidden');
-                }
-          })
-           if(categoryName === "Addons"){
-                CreationsButton.classList.add('hidden');
-             bioLink.classList.add('hidden');
             }
-           else if(categoryName === "Creations"){
-                AddonsButton.classList.add('hidden');
+       };
+         const hideOtherContainers = (current, categoryName) => {
+          fileListContainers.forEach(container => {
+                if (container !== current) {
+                   container.classList.add('hidden')
+                    container.querySelector('.loading').classList.add('hidden')
+                    container.querySelector('.empty-message').classList.add('hidden');
+              }
+          })
+            if(categoryName === "addons"){
+              creationsButton.classList.add('hidden');
               bioLink.classList.add('hidden');
             }
+            else if(categoryName === "creations"){
+                 addonsButton.classList.add('hidden');
+                bioLink.classList.add('hidden');
+           }
         }
         const showAllButtons = () => {
-             CreationsButton.classList.remove('hidden');
-               AddonsButton.classList.remove('hidden');
-            bioLink.classList.remove('hidden');
+           creationsButton.classList.remove('hidden');
+           addonsButton.classList.remove('hidden');
+           bioLink.classList.remove('hidden');
         }
         const toggleButton = (container, button) => {
-             if (container.classList.contains('hidden')) {
-               button.textContent = 'Hide';
-            }
-           else {
-               button.textContent = button.id.replace('-button', '');
+            if (container.classList.contains('hidden')) {
+                button.textContent = 'Hide';
            }
-        }
-       const toggleCategory = (container, button, categoryName) => {
-            if(!canToggleAddons && categoryName === 'Addons' ){
-                return
+            else {
+                button.textContent = button.id.replace('-button', '');
           }
-            if(!canToggleCreations && categoryName === 'Creations'){
+        }
+        const toggleCategory = (container, button, categoryName) => {
+           if(!canToggleAddons && categoryName === 'addons' ){
                return
             }
-          hideOtherContainers(container, categoryName);
+            if(!canToggleCreations && categoryName === 'creations'){
+                return
+          }
+            hideOtherContainers(container, categoryName);
             if(container.classList.contains('hidden')){
-                 toggleButton(container, button);
-               if(categoryName === 'Addons') toggleAddonsCount++;
-               if(categoryName === 'Creations') toggleCreationsCount++;
-              fetchAndDisplayFiles(container,  categoryName === 'Addons' ? 'Addons' : 'my_Addons', container.querySelector('.empty-message'), container.querySelector('.loading'))
-         }
-            else {
-                toggleButton(container, button);
-                container.classList.add('hidden');
-                container.querySelector('.empty-message').classList.add('hidden');
-               showAllButtons();
-           }
+              toggleButton(container, button);
+              if(categoryName === 'addons') toggleAddonsCount++;
+               if(categoryName === 'creations') toggleCreationsCount++;
+                 fetchAndDisplayFiles(container,  categoryName === 'addons' ? 'addons' : 'my_addons', container.querySelector('.empty-message'), container.querySelector('.loading'))
 
-            if((categoryName === 'Addons' && toggleAddonsCount > SHOW_HIDE_LIMIT) || (categoryName === 'Creations' && toggleCreationsCount > SHOW_HIDE_LIMIT)){
-                 alert("Hey! End this toy game! Download or go!");
-                if(categoryName === 'Addons') {
+           }
+            else {
+                 toggleButton(container, button);
+                container.classList.add('hidden');
+                 container.querySelector('.empty-message').classList.add('hidden');
+                showAllButtons();
+            }
+
+            if((categoryName === 'addons' && toggleAddonsCount > SHOW_HIDE_LIMIT) || (categoryName === 'creations' && toggleCreationsCount > SHOW_HIDE_LIMIT)){
+                alert("Hey! End this toy game! Download or go!");
+               if(categoryName === 'addons') {
                    canToggleAddons = false;
+                    setTimeout(() => {
+                      canToggleAddons = true;
+                  }, COOLDOWN_TIME);
+               }
+               if(categoryName === 'creations'){
+                   canToggleCreations = false;
                    setTimeout(() => {
-                       canToggleAddons = true;
+                        canToggleCreations = true;
                     }, COOLDOWN_TIME);
                 }
-                if(categoryName === 'Creations'){
-                  canToggleCreations = false;
-                    setTimeout(() => {
-                       canToggleCreations = true;
-                   }, COOLDOWN_TIME);
-               }
-            }
-        }
-
-        // Show/Hide functionality for Addons
-        AddonsButton.addEventListener('click', () => {
-              toggleCategory(AddonsContainer, AddonsButton, 'Addons');
-        });
-
-        // Show/Hide functionality for Creations
-         CreationsButton.addEventListener('click', () => {
-                toggleCategory(CreationsContainer, CreationsButton, 'Creations');
+           }
+       }
+        // Show/Hide functionality for addons
+         addonsButton.addEventListener('click', () => {
+            toggleCategory(addonsContainer, addonsButton, 'addons');
+         });
+        // Show/Hide functionality for creations
+        creationsButton.addEventListener('click', () => {
+              toggleCategory(creationsContainer, creationsButton, 'creations');
          });
         // Search functionality
          searchBar.addEventListener('input', () => {
-            clearTimeout(searchTimeout);
+           clearTimeout(searchTimeout);
              if(searchBar.value.length < 1) {
                 searchBar.placeholder = "Search for an addon"
-                fileListContainers.forEach(container => {
-                      container.classList.remove('hidden');
-                 })
-                 return
+               fileListContainers.forEach(container => {
+                    container.classList.remove('hidden');
+               })
+                return
             }
-           searchBar.placeholder = ''
+             searchBar.placeholder = ''
              searchTimeout = setTimeout(() => {
                const searchTerm = searchBar.value.toLowerCase();
                 fileListContainers.forEach(container => {
-                    const fileList = container.querySelectorAll('li a')
-                  fileList.forEach(link => {
-                        const filename = link.textContent.toLowerCase()
+                   const fileList = container.querySelectorAll('li a')
+                   fileList.forEach(link => {
+                     const filename = link.textContent.toLowerCase()
                       const index = filename.indexOf(searchTerm);
-                      if (index > -1) {
+                     if (index > -1) {
                           let highlighted = filename.substring(0, index)
-                          highlighted += `<span style="background-color:orange;">${filename.substring(index, index+ searchTerm.length)}</span>`
-                           highlighted += filename.substring(index+searchTerm.length)
-                         link.innerHTML = highlighted
-                            link.parentElement.style.display = 'block'
-                      }
+                            highlighted += `<span style="background-color:orange;">${filename.substring(index, index+ searchTerm.length)}</span>`
+                            highlighted += filename.substring(index+searchTerm.length)
+                           link.innerHTML = highlighted
+                           link.parentElement.style.display = 'block'
+                        }
                       else{
-                           link.parentElement.style.display = 'none'
-                       }
-                  });
-                   if(!container.querySelector('li a:not([style*="display: none;"])')){
+                            link.parentElement.style.display = 'none'
+                      }
+                 });
+                    if(!container.querySelector('li a:not([style*="display: none;"])')){
                       container.classList.add('hidden')
-                  }
-                  else{
-                        container.classList.remove('hidden')
                    }
+                    else{
+                       container.classList.remove('hidden')
+                  }
                })
-          }, 2000);
+           }, 2000);
         });
     </script>
 </body>
