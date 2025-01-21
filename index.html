@@ -3,17 +3,247 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Awesome Website</title>
+    <title>Panda's repo</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+    .side-container {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .upper-side {
+        width: 100%;
+        padding: 20px;
+        background-color: rgba(255, 255, 255, 0.8);
+        position: relative;
+        z-index: 1;
+        box-sizing: border-box;
+    }
+
+    .lower-side {
+        width: 100%;
+        padding: 20px;
+        overflow-y: auto; /* Enable vertical scrolling if content is long */
+        box-sizing: border-box;
+    }
+    .file-list-container{
+      display: flex;
+      flex-direction: column;
+    }
+    .file-list-container.hidden{
+      display: none;
+    }
+    .loading {
+      font-style: italic;
+    }
+    .file-list {
+      list-style-type: none;
+      padding: 0;
+    }
+    .file-list li{
+      margin-bottom: 10px;
+    }
+    .file-list a{
+      display: block;
+      padding: 10px;
+      background-color: #f0f0f0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+      text-decoration: none;
+      color: #007bff;
+    }
+     .file-list a.downloaded{
+        color: black;
+     }
+    .file-list a:hover {
+      background-color: #e0e0e0;
+    }
+    .search-bar {
+      margin-bottom: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .search-bar::placeholder {
+      font-style: italic;
+      color: grey
+    }
+    </style>
 </head>
 <body>
-    <h1>Welcome to My Website!</h1>
-    <p>This is a basic webpage hosted on GitHub Pages.</p>
-    <img src="image.png" alt="My Image">
-    <ul>
-      <li><a href="page1.html">Page 1</a></li>
-      <li><a href="page2.html">Page 2</a></li>
-    </ul>
-    
+  <div class="side-container">
+      <div class="upper-side">
+          <input class="search-bar" type="text" placeholder="Search for an addon">
+          <h1>Welcome to My Website!</h1>
+           <p>This is a basic webpage hosted on GitHub Pages.</p>
+          <div class="labels">
+            <button id="addons-button">Addons</button>
+            <button id="creations-button">Creations</button>
+            <a id="bio-link" href="bio.html">Biology</a>
+          </div>
+      </div>
+      <div class="lower-side">
+        <div id="addons-container" class="file-list-container hidden">
+            <div class="loading">loading...</div>
+           <ul class="file-list" data-dir="addons"></ul>
+        </div>
+        <div id="creations-container" class="file-list-container hidden">
+            <div class="loading">loading...</div>
+            <ul class="file-list" data-dir="my_addons"></ul>
+        </div>
+      </div>
+  </div>
+
+    <script>
+         const searchBar = document.querySelector('.search-bar');
+         const addonsButton = document.getElementById('addons-button');
+         const creationsButton = document.getElementById('creations-button');
+         const bioLink = document.getElementById('bio-link');
+         const addonsContainer = document.getElementById('addons-container');
+         const creationsContainer = document.getElementById('creations-container');
+         const fileListContainers = [addonsContainer, creationsContainer]
+         const loading = document.querySelectorAll('.loading')
+
+         let searchTimeout;
+         let toggleAddonsCount = 0
+         let toggleCreationsCount = 0
+         let canToggleAddons = true
+         let canToggleCreations = true
+         const COOLDOWN_TIME = 4000;
+         const SHOW_HIDE_LIMIT = 4;
+
+         // Function to fetch and display files from a directory
+         const fetchAndDisplayFiles = async (container, directory) => {
+          const fileList = container.querySelector("ul");
+          fileList.innerHTML = '';
+            const apiUrl = `https://api.github.com/repos/PandaHo485/BasicFilesForSRB2Server/contents/${directory}`
+
+             try{
+               const response = await fetch(apiUrl)
+               if(!response.ok) throw new Error("Network error")
+               const data = await response.json()
+                data.forEach(item => {
+                    if (item.type === 'file') {
+                        const listItem = document.createElement("li");
+                        const link = document.createElement("a");
+                        link.href = item.name;
+                        link.textContent = item.name;
+                        link.addEventListener('click', function (){
+                           link.classList.add('downloaded')
+                        });
+                        listItem.appendChild(link);
+                        fileList.appendChild(listItem);
+                    }
+                });
+                container.classList.remove('hidden')
+             }
+             catch(error){
+                 console.log(error)
+             }
+             finally{
+               container.querySelector('.loading').style.display = 'none';
+             }
+        };
+        const hideOtherContainers = (current) => {
+          fileListContainers.forEach(container => {
+              if (container !== current) {
+                  container.classList.add('hidden')
+                  container.querySelector('.loading').style.display = ''
+              }
+          })
+        }
+
+         // Show/Hide functionality for addons
+        addonsButton.addEventListener('click', () => {
+           if(!canToggleAddons){
+              return;
+           }
+          hideOtherContainers(addonsContainer);
+          if(addonsContainer.classList.contains('hidden')){
+           toggleAddonsCount++;
+           addonsButton.textContent = "Hide";
+              fetchAndDisplayFiles(addonsContainer, 'addons')
+           }
+          else {
+           addonsContainer.classList.add('hidden')
+           addonsButton.textContent = "Addons";
+           addonsContainer.querySelector('.loading').style.display = '';
+          }
+
+           if(toggleAddonsCount > SHOW_HIDE_LIMIT){
+                alert("Hey! End this toy game! Download or go!");
+                canToggleAddons = false;
+                setTimeout(() => {
+                  canToggleAddons = true;
+                }, COOLDOWN_TIME);
+           }
+        });
+
+         // Show/Hide functionality for creations
+        creationsButton.addEventListener('click', () => {
+           if(!canToggleCreations){
+               return;
+           }
+         hideOtherContainers(creationsContainer);
+         if(creationsContainer.classList.contains('hidden')){
+             toggleCreationsCount++;
+             creationsButton.textContent = "Hide";
+              fetchAndDisplayFiles(creationsContainer, 'my_addons')
+         }
+         else{
+            creationsContainer.classList.add('hidden')
+            creationsButton.textContent = "Creations"
+            creationsContainer.querySelector('.loading').style.display = ''
+         }
+
+         if(toggleCreationsCount > SHOW_HIDE_LIMIT){
+            alert("Hey! End this toy game! Download or go!");
+            canToggleCreations = false;
+             setTimeout(() => {
+               canToggleCreations = true;
+             }, COOLDOWN_TIME);
+            }
+        });
+        // Search functionality
+        searchBar.addEventListener('input', () => {
+          clearTimeout(searchTimeout);
+          if(searchBar.value.length < 1) {
+            searchBar.placeholder = "Search for an addon"
+             fileListContainers.forEach(container => {
+                   container.classList.remove('hidden');
+             })
+             return
+          }
+          searchBar.placeholder = ''
+            searchTimeout = setTimeout(() => {
+                const searchTerm = searchBar.value.toLowerCase();
+                fileListContainers.forEach(container => {
+                  const fileList = container.querySelectorAll('li a')
+                 fileList.forEach(link => {
+                     const filename = link.textContent.toLowerCase()
+                     const index = filename.indexOf(searchTerm);
+                     if (index > -1) {
+                         let highlighted = filename.substring(0, index)
+                         highlighted += `<span style="background-color:orange;">${filename.substring(index, index+ searchTerm.length)}</span>`
+                         highlighted += filename.substring(index+searchTerm.length)
+                         link.innerHTML = highlighted
+                         link.parentElement.style.display = 'block'
+                     }
+                     else{
+                         link.parentElement.style.display = 'none'
+                     }
+                });
+                if(!container.querySelector('li a:not([style*="display: none;"])')){
+                     container.classList.add('hidden')
+                  }
+                else{
+                   container.classList.remove('hidden')
+                }
+               })
+           }, 2000);
+        });
+
+    </script>
 </body>
 </html>
