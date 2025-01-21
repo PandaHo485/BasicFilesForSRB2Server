@@ -136,160 +136,172 @@
         const SHOW_HIDE_LIMIT = 4;
         const GITHUB_REPO_URL = 'https://github.com/PandaHo485/BasicFilesForSRB2Server/raw/main/';
 
-        // Function to fetch and display files from a directory
+         // Function to fetch and display files from a directory
         const fetchAndDisplayFiles = async (container, directory, emptyMessage, loading) => {
-          const fileList = container.querySelector("ul");
-          fileList.innerHTML = '';
-           const apiUrl = `https://api.github.com/repos/PandaHo485/BasicFilesForSRB2Server/contents/${directory}`
+            const fileList = container.querySelector("ul");
+            fileList.innerHTML = '';
+            const apiUrl = `https://api.github.com/repos/PandaHo485/BasicFilesForSRB2Server/contents/${directory}`
 
-            try {
-               loading.classList.remove('hidden')
-                const response = await fetch(apiUrl)
+           try{
+                loading.classList.remove('hidden')
+                 const response = await fetch(apiUrl)
                 if(!response.ok) throw new Error("Network error")
                 const data = await response.json()
-                if (data.length === 0) {
+               if (data.length === 0) {
                     emptyMessage.classList.remove('hidden')
                     container.classList.remove('hidden')
-                  return
-                }
+                   return
+               }
                emptyMessage.classList.add('hidden');
-              data.forEach(item => {
+                data.forEach(item => {
                    if (item.type === 'file') {
-                       const listItem = document.createElement("li");
+                        const listItem = document.createElement("li");
                        const link = document.createElement("a");
-                        link.href = GITHUB_REPO_URL + directory + '/' + item.name;
-                        link.textContent = item.name;
-                        link.target = "_blank";
-                         link.addEventListener('click', function (event){
-                          event.preventDefault(); // Prevent the default anchor click
-                             window.location.href = link.href
-                           link.classList.add('downloaded')
-                        });
+                        const downloadUrl = GITHUB_REPO_URL + directory + '/' + item.name;
+                      link.href = `/download?url=${encodeURIComponent(downloadUrl)}&filename=${encodeURIComponent(item.name)}`;
+                      link.textContent = item.name;
+                       link.addEventListener('click', function (){
+                          link.classList.add('downloaded')
+                       });
                        listItem.appendChild(link);
                        fileList.appendChild(listItem);
                     }
-                });
-                container.classList.remove('hidden')
-           } catch (error) {
-               console.log(error)
-         }
-           finally{
-              loading.classList.add('hidden')
+               });
+             container.classList.remove('hidden')
           }
-       };
-         const hideOtherContainers = (current, categoryName) => {
+          catch(error){
+             console.log(error)
+          }
+           finally{
+                loading.classList.add('hidden')
+          }
+      };
+        const hideOtherContainers = (current, categoryName) => {
           fileListContainers.forEach(container => {
                 if (container !== current) {
-                    container.classList.add('hidden')
-                   container.querySelector('.loading').classList.add('hidden')
-                   container.querySelector('.empty-message').classList.add('hidden');
-               }
-           })
+                     container.classList.add('hidden')
+                    container.querySelector('.loading').classList.add('hidden')
+                    container.querySelector('.empty-message').classList.add('hidden');
+                }
+         })
             if(categoryName === "addons"){
               creationsButton.classList.add('hidden');
-               bioLink.classList.add('hidden');
+                bioLink.classList.add('hidden');
             }
-          else if(categoryName === "creations"){
-              addonsButton.classList.add('hidden');
+           else if(categoryName === "creations"){
+                addonsButton.classList.add('hidden');
                bioLink.classList.add('hidden');
            }
        }
         const showAllButtons = () => {
            creationsButton.classList.remove('hidden');
-            addonsButton.classList.remove('hidden');
-            bioLink.classList.remove('hidden');
-       }
+           addonsButton.classList.remove('hidden');
+           bioLink.classList.remove('hidden');
+        }
         const toggleButton = (container, button) => {
             if (container.classList.contains('hidden')) {
-                button.textContent = 'Hide';
+                 button.textContent = 'Hide';
            }
-            else {
-              button.textContent = button.id.replace('-button', '');
+           else {
+               button.textContent = button.id.replace('-button', '');
           }
        }
         const toggleCategory = (container, button, categoryName) => {
            if(!canToggleAddons && categoryName === 'addons' ){
-               return
-            }
-           if(!canToggleCreations && categoryName === 'creations'){
                 return
-          }
-            hideOtherContainers(container, categoryName);
+           }
+           if(!canToggleCreations && categoryName === 'creations'){
+               return
+           }
+          hideOtherContainers(container, categoryName);
             if(container.classList.contains('hidden')){
                 toggleButton(container, button);
               if(categoryName === 'addons') toggleAddonsCount++;
-                if(categoryName === 'creations') toggleCreationsCount++;
-                fetchAndDisplayFiles(container,  categoryName === 'addons' ? 'addons' : 'my_addons', container.querySelector('.empty-message'), container.querySelector('.loading'))
+                 if(categoryName === 'creations') toggleCreationsCount++;
+                 fetchAndDisplayFiles(container,  categoryName === 'addons' ? 'addons' : 'my_addons', container.querySelector('.empty-message'), container.querySelector('.loading'))
            }
-           else {
+            else {
                  toggleButton(container, button);
-               container.classList.add('hidden');
-                container.querySelector('.empty-message').classList.add('hidden');
-               showAllButtons();
+                container.classList.add('hidden');
+               container.querySelector('.empty-message').classList.add('hidden');
+                 showAllButtons();
             }
+
            if((categoryName === 'addons' && toggleAddonsCount > SHOW_HIDE_LIMIT) || (categoryName === 'creations' && toggleCreationsCount > SHOW_HIDE_LIMIT)){
                alert("Hey! End this toy game! Download or go!");
-              if(categoryName === 'addons') {
-                  canToggleAddons = false;
-                   setTimeout(() => {
+               if(categoryName === 'addons') {
+                   canToggleAddons = false;
+                    setTimeout(() => {
                        canToggleAddons = true;
                     }, COOLDOWN_TIME);
                }
-                if(categoryName === 'creations'){
+               if(categoryName === 'creations'){
                     canToggleCreations = false;
                     setTimeout(() => {
-                      canToggleCreations = true;
+                       canToggleCreations = true;
                   }, COOLDOWN_TIME);
                }
-            }
-        }
-       // Show/Hide functionality for addons
-         addonsButton.addEventListener('click', () => {
-            toggleCategory(addonsContainer, addonsButton, 'addons');
-        });
-      // Show/Hide functionality for creations
+          }
+       }
+        // Show/Hide functionality for addons
+          addonsButton.addEventListener('click', () => {
+               toggleCategory(addonsContainer, addonsButton, 'addons');
+          });
+        // Show/Hide functionality for creations
         creationsButton.addEventListener('click', () => {
-              toggleCategory(creationsContainer, creationsButton, 'creations');
-       });
-
+               toggleCategory(creationsContainer, creationsButton, 'creations');
+         });
        // Search functionality
-          searchBar.addEventListener('input', () => {
-           clearTimeout(searchTimeout);
-            if(searchBar.value.length < 1) {
-               searchBar.placeholder = "Search for an addon"
+        searchBar.addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+          if(searchBar.value.length < 1) {
+              searchBar.placeholder = "Search for an addon"
                 fileListContainers.forEach(container => {
-                    container.classList.remove('hidden');
-               })
+                     container.classList.remove('hidden');
+                })
                 return
-            }
-           searchBar.placeholder = ''
-             searchTimeout = setTimeout(() => {
-               const searchTerm = searchBar.value.toLowerCase();
+           }
+            searchBar.placeholder = ''
+            searchTimeout = setTimeout(() => {
+                const searchTerm = searchBar.value.toLowerCase();
                 fileListContainers.forEach(container => {
-                    const fileList = container.querySelectorAll('li a')
+                  const fileList = container.querySelectorAll('li a')
                   fileList.forEach(link => {
-                      const filename = link.textContent.toLowerCase()
+                       const filename = link.textContent.toLowerCase()
                       const index = filename.indexOf(searchTerm);
-                     if (index > -1) {
-                        let highlighted = filename.substring(0, index)
-                        highlighted += `<span style="background-color:orange;">${filename.substring(index, index+ searchTerm.length)}</span>`
-                         highlighted += filename.substring(index+searchTerm.length)
-                        link.innerHTML = highlighted
-                           link.parentElement.style.display = 'block'
-                      }
-                      else{
-                           link.parentElement.style.display = 'none'
-                      }
-                 });
-                    if(!container.querySelector('li a:not([style*="display: none;"])')){
-                        container.classList.add('hidden')
-                    }
-                    else{
-                        container.classList.remove('hidden')
-                    }
+                       if (index > -1) {
+                          let highlighted = filename.substring(0, index)
+                         highlighted += `<span style="background-color:orange;">${filename.substring(index, index+ searchTerm.length)}</span>`
+                        highlighted += filename.substring(index+searchTerm.length)
+                          link.innerHTML = highlighted
+                         link.parentElement.style.display = 'block'
+                       }
+                       else{
+                            link.parentElement.style.display = 'none'
+                       }
+                  });
+                   if(!container.querySelector('li a:not([style*="display: none;"])')){
+                      container.classList.add('hidden')
+                   }
+                   else{
+                     container.classList.remove('hidden')
+                 }
                })
            }, 2000);
         });
+    </script>
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const url = params.get('url');
+        const filename = params.get('filename');
+        if (url && filename) {
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+             document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
     </script>
 </body>
 </html>
