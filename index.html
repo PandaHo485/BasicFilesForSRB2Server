@@ -158,13 +158,14 @@
                    if (item.type === 'file') {
                        const listItem = document.createElement("li");
                         const link = document.createElement("a");
-                         link.href = GITHUB_REPO_URL + directory + '/' + item.name;
+                        link.href = GITHUB_REPO_URL + directory + '/' + item.name;
                         link.textContent = item.name;
+                        link.setAttribute('download', item.name);  // Add the download attribute here
                        link.addEventListener('click', function (){
                             link.classList.add('downloaded')
                        });
                        listItem.appendChild(link);
-                        fileList.appendChild(listItem);
+                       fileList.appendChild(listItem);
                    }
               });
               container.classList.remove('hidden')
